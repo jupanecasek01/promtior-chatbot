@@ -26,11 +26,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r promtior-bot/requirements.txt
 
-    # 4. Build (opcional, si necesitas alguna tarea previa al despliegue)
-    - name: Run tests (opcional)
-      run: |
-        pytest  # Si tienes pruebas, este es el lugar adecuado para ejecutarlas
-
     # 5. Deploy a Azure Web App
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
