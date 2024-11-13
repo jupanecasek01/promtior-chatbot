@@ -12,11 +12,11 @@ jobs:
     steps:
     # 1. Checkout del código
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3  # Actualizado a v3
 
     # 2. Set up Python
     - name: Set up Python 3.9
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3  # Actualizado a v3
       with:
         python-version: '3.9'
 
@@ -35,6 +35,6 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'promtior-chatbot'  # Reemplaza con el nombre de tu app service en Azure
+        app-name: 'my-app-service'  # Reemplaza con el nombre de tu app service en Azure
         publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}  # Agrega tu archivo de perfil de publicación en Secrets
-        package: 'promtior-bot'  # Este es el directorio que se va a desplegar
+        package: '.'  # Este es el directorio que se va a desplegar (ajústalo si es necesario)
