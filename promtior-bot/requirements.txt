@@ -1,0 +1,9 @@
+asyncio
+langchain
+langchain-groq
+langgraph
+langsmith
+langchain-community
+python-dotenv
+beautifulsoup4
+flask
