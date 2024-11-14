@@ -1,4 +1,4 @@
-import asyncio
+import os
 from typing import Dict, List, TypedDict
 from langchain.prompts import PromptTemplate
 from langchain.chains import ConversationChain
@@ -10,8 +10,6 @@ from langchain_community.document_loaders import PyPDFLoader
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 from langchain_community.document_loaders.recursive_url_loader import RecursiveUrlLoader
-import os
-
 
 load_dotenv()
 groq_key = os.getenv("GROQ_API_KEY")
@@ -43,13 +41,11 @@ docs = loader.load()
 
 # Define the conversation state
 class GraphState(TypedDict):
-        
     initial_question: str
     question_category: str
     final_response: str
     num_steps: int
     conversation_history: List[Dict[str, str]]
-   
 
 # Node for question categorization
 @traceable
@@ -63,7 +59,7 @@ def categorize_question(state):
     Provide a single word with the category (service, founding, other).
     QUESTION CONTENT:\n {initial_question} \n
     """
-    initial_question = state["initial_question"]  # Cambiado a índice de diccionario
+    initial_question = state["initial_question"]
     state["num_steps"] += 1
 
     combined_prompt = prompt_template.format(initial_question=initial_question)
@@ -79,8 +75,6 @@ def categorize_question(state):
 
 @traceable
 def service_information_response(state):
-   
-    pdf_text = ""
     pdf_text = load_pdf_content("AI Engineer.pdf")
     web_text = docs
 
@@ -110,8 +104,6 @@ def service_information_response(state):
 # Node for founding-related responses
 @traceable
 def founding_information_response(state):
-
-    pdf_text = ""
     pdf_text = load_pdf_content("AI Engineer.pdf")
     
     prompt = PromptTemplate(
@@ -119,7 +111,7 @@ def founding_information_response(state):
     You are an assistant for the Promtior website. Respond only with relevant information in English, omitting references to where it was sourced.
     
     QUESTION CONTENT:\n{initial_question}\n   
-    MAIN INFOMATION (from PDF):\n{pdf_text}
+    MAIN INFORMATION (from PDF):\n{pdf_text}
     """
     )
 
@@ -143,15 +135,7 @@ def other_inquiry_response(state):
 
 # State printer
 def state_printer(state):
-   #"""Imprime el estado."""
-   # print("---IMPRESORA DE ESTADO---")
-   # print(f"Pregunta Inicial: {state['initial_question']}\n")
-    #print(f"Categoría de Pregunta: {state['question_category']}\n")
     print(f"{state['final_response']}\n")
-   # print(f"Pasos: {state['num_steps']}\n")
-   # print("Historial de Conversación:")
-   # for message in state.get("conversation_history", []):
-   #    print(f"{message['role'].capitalize()}: {message['content']}") #
     return state
 
 # Function to route responses
@@ -166,7 +150,6 @@ def route_to_respond(state):
 
 # Set up the workflow
 workflow = StateGraph(GraphState)
-
 
 # Define nodes and transitions
 workflow.add_node("categorize_question", categorize_question)
@@ -209,26 +192,12 @@ def retrieve_state(conversation_id):
         "conversation_history": [],
         "conversation_id": conversation_id,
     }
-# Function to execute the chatbot
-# Función para ejecutar el chatbot
+
+# Function to execute the chatbot (síncrona)
 def execute_agent(question, conversation_id):
     global states  # Ensure state is recognized as global
     state = retrieve_state(conversation_id)
     state["initial_question"] = question
     states.append(state)
-    # print(state)
     output = app.invoke(state)
     return output
-
-
-async def main():
-
-    while True:
-        question = input("Ingresar la pregunta: ")
-        conversation_id = (input("Ingresar ID de conversación: "))
-        output = execute_agent(question, conversation_id)
-        # print(output)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

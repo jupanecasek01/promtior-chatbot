@@ -1,11 +1,9 @@
+# app.py:
 from flask import Flask, request, jsonify
-import os
-import asyncio
 from bot import execute_agent
 
 app = Flask(__name__)
 
-@app.route("/api/messages", methods=["POST"])
 @app.route("/api/messages", methods=["POST"])
 def messages():
     question = request.json.get("question")
